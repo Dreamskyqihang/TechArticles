@@ -14,6 +14,7 @@
 在调研过程中，发现需求功能可以使用推送来实现，但最终经过各种考虑，发现自建长连接进行实时数据推送是最为贴合需求的实现方案；调研过程中，对推送厂家方案及本文方案做了对比，结果如下：
 
 |:推送SDK:|:集成APNS:|:保持长链接:|
+|  ----  | ----  | ---- |
 |极光推送|是|是|
 |个推|是|是|
 |百度推送|是|否|
@@ -58,17 +59,19 @@
 ### 技术方案实践
 #### 方案调研
 基于需求的场景，车分期的销售用户，需要及时知晓订单的审核状态，需要服务器的审核状态及时传送到客户端，此场景是在用户使用APP过程中回调，故在APP存活过程中保持长连接的存在是此次方案主要解决的问题；APP在被杀死之后消息的到达，可以通过接入推送系统来解决，但由于时间紧迫，系统一期优先实现方案如下，技术方案大体流程如下图：
-[推送流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%8E%A8%E9%80%81%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+
+![推送流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%8E%A8%E9%80%81%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
 
 在整个过程中，消息的实时传送靠推送后台和长连接SDK建立的长连接来实现；基于本方案实现的SDK则负责和推送后台维持长连接的有效性以及维持长连接的优化功能；
 详细流程中涉及到的交互方和交互流程参照下图：
-[交互流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B.png)
+
+![交互流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E4%BA%A4%E4%BA%92%E6%B5%81%E7%A8%8B.png)
 
 #### 方案架构
 
 在整个数据实时传送方案中，涉及到长连接的建立维护、通信数据按协议封装、业务数据封装及优化等功能，在此对整个方案运用到的技术点放进系统架构图中进行抽象整理，整理之后结构如下：
 
-[方案架构](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E9%95%BF%E8%BF%9E%E6%8E%A5%E6%96%B9%E6%A1%88%E7%BB%93%E6%9E%84%E5%9B%BE.jpg)
+![方案架构](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E9%95%BF%E8%BF%9E%E6%8E%A5%E6%96%B9%E6%A1%88%E7%BB%93%E6%9E%84%E5%9B%BE.jpg)
 
 在整体结构中，分为业务层、应用层、传输层、和网络层，其中业务层、应用层、传输层组成了数据实时推送服务的```SDK```； 下面对整个```SDK```架构层级，以及各层级间包含的模块进行详细整理及说明；
 
@@ -89,7 +92,8 @@
 该层主要为调用系统```API```对```Socket```数据进行拼接组装，以及发起连接、关闭连接等操作；
 
 对于该方案的具体模块，以上均已介绍完毕，以下是对该方案大致流程的梳理，如下图：
-[数据处理流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.jpg)
+
+![数据处理流程](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.jpg)
 
 此流程展示出了```SDK```从建立连接、接收数据，经由```TCP```数据包处理、```MQTT```通信数据解析，到```Protocol Buffers```数据格式处理等大致流程；
 
@@ -120,6 +124,7 @@ TCP中的```KeepAlive``` 是保持TCP连接的存活，也就是说它保持了�
 据网络查询出的结果可得到部分运营商NAT超时时间：
 
 |:运营商:|:NAT超时时间:|
+|  ----  | ----  |
 |移动|5分钟|
 |联通|5分钟|
 |电信|大于28分钟|
@@ -146,7 +151,8 @@ TCP中的```KeepAlive``` 是保持TCP连接的存活，也就是说它保持了�
 #### 实现杀死APP的情况下消息的推送
 
 为进一步提升用户体验，完善推送系统，实现APP在杀死的情况下，也可以接收到推送消息，对于iOS开发中来说，由于苹果公司的限制，在APP没有启动的情况下，只能通过APNS来进行推送，故，后续接入苹果APNS即可实现该功能，完善之后的流程图如下：
-[推送流程优化](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%8E%A8%E9%80%81%E6%B5%81%E7%A8%8B%E5%9B%BE-2.png)
+
+![推送流程优化](https://github.com/Dreamskyqihang/TechArticles/blob/master/Resources/MQTT/%E6%8E%A8%E9%80%81%E6%B5%81%E7%A8%8B%E5%9B%BE-2.png)
 
 #### 智能心跳策略
 
