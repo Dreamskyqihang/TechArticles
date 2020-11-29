@@ -17,4 +17,9 @@ iOS相关技术心得，记录和分享我在学习和工作中的一些收获 ~
 ### 算法相关
 - [LeetCode刷题思路记录](https://github.com/Dreamskyqihang/TechArticles/tree/master/LeetCode)
 
+### 有趣的问题
+- [三姬分金](https://github.com/Dreamskyqihang/TechArticles/blob/master/InterestingQuestions/三姬分金.md)
+
+- [圆桌硬币](https://github.com/Dreamskyqihang/TechArticles/blob/master/InterestingQuestions/圆桌硬币.md)
+
 
